@@ -14,7 +14,13 @@ public class End : Interactable{
 			GameManager.S.DeltaCursorsRemaining(-cursorsUsed);
 			GameManager.S.UpdateLevelUI(scene);
 		}
-		SceneManager.LoadScene((scene + 1) % SceneManager.sceneCountInBuildSettings);
+		int nextScene = (scene + 1) % SceneManager.sceneCountInBuildSettings;
+		if (GameManager.S.levels[nextScene].status == -2)
+		{
+			GameManager.S.levels[nextScene].status = -1;
+			GameManager.S.UpdateLevelUI(nextScene);
+		}
+		SceneManager.LoadScene(nextScene);
 	}
 
 	public override void RemovedLastCursor()

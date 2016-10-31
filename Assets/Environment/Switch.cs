@@ -14,6 +14,7 @@ public class Switch : Interactable{
 			g.SetActive(false);
 		foreach (GameObject g in turnOn)
 			g.SetActive(true);
+		SoundManager.S.wallUp.Play();
 	}
 
 	public override void RemovedLastCursor()
@@ -22,6 +23,7 @@ public class Switch : Interactable{
 			g.SetActive(true);
 		foreach (GameObject g in turnOn)
 			g.SetActive(false);
+		SoundManager.S.wallDown.Play();
 	}
 
 }

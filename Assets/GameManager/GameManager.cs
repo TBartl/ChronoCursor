@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
 	float lastScroll = 0;
 	int hoverIndex = 0;
 
-	static int cursorsRemaining = 20;
+	static int cursorsRemaining = 18;
 	public Text cursorsRemainingText;
 
 	bool couldClone = false;
@@ -66,11 +66,17 @@ public class GameManager : MonoBehaviour {
 		{
 			if (!levelSelectGO.activeSelf || levels[hoverIndex].status != -2)
 				levelSelectGO.SetActive(!levelSelectGO.activeSelf);
+			else
+				SoundManager.S.no.Play();
 
 			//Just closed ui, load level
 			if (!levelSelectGO.activeSelf)
 			{
 				SceneManager.LoadScene((hoverIndex) % SceneManager.sceneCountInBuildSettings);
+			}
+			else
+			{
+				SetHover(SceneManager.GetActiveScene().buildIndex);
 			}
 		}
 
@@ -92,6 +98,15 @@ public class GameManager : MonoBehaviour {
 			int scene = SceneManager.GetActiveScene().buildIndex;
 			SceneManager.LoadScene(scene);
 		}
+
+		if (Input.GetKeyDown(KeyCode.Alpha0)) {
+			for (int i = 0; i < levels.Count; i++)
+			{
+				levels[i].status = levels[i].cursorPar;
+				UpdateLevelUI(i);
+			}
+		}
+
 	}
 
 	void LateUpdate()
@@ -111,6 +126,9 @@ public class GameManager : MonoBehaviour {
 	
 	IEnumerator SetHover(int i)
 	{
+		if (hoverIndex != i)
+			SoundManager.S.scrollTick.Play();
+
 		Vector3 originalPos = Vector3.up * 200 * hoverIndex;
 		hoverIndex = Mathf.Clamp(i, 0, levels.Count - 1);
 		Vector3 newPos = Vector3.up * 200 * hoverIndex;
@@ -145,6 +163,8 @@ public class GameManager : MonoBehaviour {
 
 	void SceneChanged(Scene previousScene, Scene newScene)
 	{
+		SoundManager.S.warp.Play();
 		currentLevelText.text = " Level " + (newScene.buildIndex + 1) + ": " + levels[newScene.buildIndex].name;
+		
 	}
 }

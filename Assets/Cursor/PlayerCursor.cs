@@ -48,7 +48,7 @@ public class PlayerCursor : MonoBehaviour {
 			Cursor.lockState = CursorLockMode.Locked;
 		}
 
-		wallMask = LayerMask.GetMask("Wall");
+		wallMask = LayerMask.GetMask("Wall", "WallCloneOnly");
 	}
 
 	void Update()
@@ -79,20 +79,32 @@ public class PlayerCursor : MonoBehaviour {
 				thisMovement = movements[movementIndex];
 				clicking = clickDown[movementIndex];
 			}
-			movementIndex += 1;
 		}
+		movementIndex += 1;
 		MovePlayer(thisMovement);
 		if (!clicking)
 			this.transform.localScale = Vector3.one * Mathf.Min(transform.localScale.x + 5 * Time.deltaTime, 1);
 		else
 			this.transform.localScale = Vector3.one * Mathf.Max(transform.localScale.x - 5 * Time.deltaTime, .7f);
+		
+		if (movementIndex > 2)
+		{
+			int i = Mathf.Min(movementIndex, clickDown.Count);
+			if (clickDown[i - 1] && !clickDown[i - 2])
+				SoundManager.S.clickDown.Play();
+			if (!clickDown[i - 1] && clickDown[i - 2])
+				SoundManager.S.clickDown.Play();
+		}
 
 
 
 
 		// Check for rewind
+		if (pressedRestart && isPlayer && !GameManager.S.GetCanClone())
+			SoundManager.S.no.Play();
+
 		if (pressedRestart &&
-			((isPlayer && GameManager.S.GetCanClone()) || (!isPlayer && GameManager.S.GetCouldClone())))
+			(!GameManager.S || ((isPlayer && GameManager.S.GetCanClone()) || (!isPlayer && GameManager.S.GetCouldClone()))))
 		{
 			pressedRestart = false;
 			this.transform.position = startPosition;
@@ -110,7 +122,10 @@ public class PlayerCursor : MonoBehaviour {
 				isPlayer = false;
 				cursorColor.SetPlayer(false);
 
-				GameManager.S.DeltaCursorsRemaining(-1);
+				wallMask = LayerMask.GetMask("Wall", "WallPlayerOnly");
+
+				if (GameManager.S)
+					GameManager.S.DeltaCursorsRemaining(-1);
 			}
 
 			clicking = false;
@@ -131,7 +146,7 @@ public class PlayerCursor : MonoBehaviour {
 
 		Vector3 currentMousePos = Input.mousePosition;
 		Vector3 diff = (currentMousePos - initialMousePos);
-		//if (diff.magnitude > 1.5f)
+		if (diff.magnitude > 1.5f)
 			thisMovement = diff * .01f;
 
 		Cursor.lockState = CursorLockMode.Locked;
@@ -169,17 +184,14 @@ public class PlayerCursor : MonoBehaviour {
 	{
 		if (other.gameObject.tag != "Interactable")
 			return;
-
 		if (clicking)
 			other.gameObject.GetComponent<Interactable>().OnCursorClick(this.gameObject);
 	}
 
-	IEnumerator OnTriggerStay2D(Collider2D other)
+	void OnTriggerStay2D(Collider2D other)
 	{
-		yield return new WaitForFixedUpdate();
-
 		if (other.gameObject.tag != "Interactable")
-			yield break;
+			return;
 
 		if (clicking)
 			other.gameObject.GetComponent<Interactable>().OnCursorClick(this.gameObject);
@@ -192,8 +204,7 @@ public class PlayerCursor : MonoBehaviour {
 		if (other.gameObject.tag != "Interactable")
 			return;
 
-		if (clicking)
-			other.gameObject.GetComponent<Interactable>().OnCursorDeClick(this.gameObject);
+		other.gameObject.GetComponent<Interactable>().OnCursorDeClick(this.gameObject);
 	}
 
 	void OnDestroy()
