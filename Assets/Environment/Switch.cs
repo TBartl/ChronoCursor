@@ -8,7 +8,7 @@ public class Switch : Interactable{
 	public List<GameObject> turnOff;
 	public List<GameObject> turnOn;
 
-	public override void FirstClick()
+	public override void AddedFirstCursor()
 	{
 		foreach (GameObject g in turnOff)
 			g.SetActive(false);
@@ -16,7 +16,7 @@ public class Switch : Interactable{
 			g.SetActive(true);
 	}
 
-	public override void RemovedLastClick()
+	public override void RemovedLastCursor()
 	{
 		foreach (GameObject g in turnOff)
 			g.SetActive(true);

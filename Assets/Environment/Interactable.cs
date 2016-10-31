@@ -1,33 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Interactable : MonoBehaviour {
-	protected int numCursors;
+	protected List<GameObject> cursors = new List<GameObject>();
 
-	public void OnTriggerEnter2D(Collider2D c)
+	public virtual void OnCursorClick(GameObject cursor)
 	{
-		numCursors += 1;
-
-		if (numCursors == 1)
-			FirstClick();
+		if (!cursors.Contains(cursor))
+			cursors.Add(cursor);
+		if (cursors.Count == 1)
+			AddedFirstCursor();
 	}
 
-	void OnTriggerExit2D(Collider2D c)
-	{
-		if (c.tag != "Player")
-			return;
 
-		numCursors -= 1;
-		if (numCursors == 0)
-			RemovedLastClick();
+	public virtual void OnCursorDeClick(GameObject cursor)
+	{
+		if (cursors.Contains(cursor))
+			cursors.Remove(cursor);
+		if (cursors.Count == 0)
+			RemovedLastCursor();
 	}
 
-	public virtual void FirstClick()
+
+	public virtual void AddedFirstCursor()
 	{
 
 	}
 
-	public virtual void RemovedLastClick()
+	public virtual void RemovedLastCursor()
 	{
 
 	}

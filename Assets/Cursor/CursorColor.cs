@@ -26,7 +26,7 @@ public class CursorColor : MonoBehaviour {
 		{
 			sr.sprite = spritePlayer;
 			this.transform.localScale = Vector3.one * 1.2f;
-			this.transform.localPosition = Vector3.back * .5f;
+			//this.transform.localPosition = Vector3.back * .5f;
 		}
 		else
 		{
