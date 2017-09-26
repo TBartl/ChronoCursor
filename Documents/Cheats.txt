@@ -1,2 +1,0 @@
-Press 0 to unlock all levels with par.
-Press Z to make the game work in editor.
